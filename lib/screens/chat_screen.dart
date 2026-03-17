@@ -7,14 +7,14 @@ import '../widgets/chat_bubble.dart';
 import '../utils/constants.dart';
 import '../models/chat_model.dart';
 
-class ChatScreen extends StatefulWidget {
+class ChatScreen extends StatefulWidget{
   const ChatScreen({super.key});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
+class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver{
   final List<MessageModel> _messages = [];
   final ScrollController _scrollController = ScrollController();
   final ApiService _apiService = ApiService();
@@ -39,7 +39,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
       'Welcome to ASTRA! How can I help you today?',
       MessageType.assistant,
     );
-    // Voice assistant को तुरंत listening शुरू करनी चाहिए
+
+
     _toggleListening();
   }
 
@@ -82,7 +83,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     });
   }
 
-  // ✅ Voice Input Only - Text Input हटा दिया
+
+
   Future<void> _processVoiceInput(String recognizedText) async {
     if (recognizedText.isEmpty || _isProcessing) return;
 
@@ -92,8 +94,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     try {
       if (!_isApiAvailable) {
         _addMessage(
-          'Backend server is not available. Please make sure the server is running.',
-          MessageType.assistant,
+          '⚠️ Backend server not connected. Please check if the server is running.',
+          MessageType.system,
         );
         setState(() => _isProcessing = false);
         return;
@@ -107,18 +109,23 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
       );
 
       final response = await _apiService.sendChatMessage(request);
+
+
       _addMessage(response.message, MessageType.assistant, isVoice: true);
+
+
       await _voiceService.speak(response.message);
 
     } catch (e) {
-      print('Error: $e');
+      print('❌ Error: $e');
       _addMessage(
         'Sorry, I encountered an error. Please try again.',
         MessageType.assistant,
       );
     } finally {
       setState(() => _isProcessing = false);
-      // फिर से listening शुरू करो
+
+
       _toggleListening();
     }
   }
@@ -140,7 +147,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
       setState(() => _isListening = true);
 
       await _voiceService.startListening((recognizedWords) {
-        if (recognizedWords.isNotEmpty) {
+        if (recognizedWords.isNotEmpty && recognizedWords.length > 2) {
           setState(() => _isListening = false);
           _processVoiceInput(recognizedWords);
         }
@@ -197,6 +204,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
               ),
             ),
             const SizedBox(width: 8),
+
             const Text(
               'ASTRA Voice Assistant',
               style: TextStyle(color: AppColors.neonPink, fontSize: 18),

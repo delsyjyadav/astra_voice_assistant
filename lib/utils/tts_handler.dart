@@ -25,11 +25,13 @@ class TtsHandler {
     try {
       var voices = await flutterTts.getVoices;
       if (voices.isNotEmpty) {
-        // Convert to proper type
+
+
         List<Map<String, String>> voiceList = [];
 
         for (var voice in voices) {
-          // Safely convert each voice to Map<String, String>
+
+
           Map<String, String> convertedVoice = {};
           voice.forEach((key, value) {
             convertedVoice[key.toString()] = value.toString();
@@ -37,24 +39,24 @@ class TtsHandler {
           voiceList.add(convertedVoice);
         }
 
-        // Try to find female voice
+
         for (var voice in voiceList) {
           String name = voice['name']?.toLowerCase() ?? '';
           if (name.contains('female') || name.contains('en-us-x-sfg')) {
             await flutterTts.setVoice(voice);
-            print('✅ Female voice set: $name');
+            print('Female voice set: $name');
             return;
           }
         }
 
-        // If no female voice, use first available
+
         if (voiceList.isNotEmpty) {
           await flutterTts.setVoice(voiceList.first);
           print('✅ Voice set: ${voiceList.first['name']}');
         }
       }
     } catch (e) {
-      print('❌ Voice set error: $e');
+      print('Voice set error: $e');
     }
   }
 
@@ -62,9 +64,9 @@ class TtsHandler {
     if (text.isEmpty) return;
     try {
       await flutterTts.speak(text);
-      print('🔊 Speaking: $text');
+      print('Speaking: $text');
     } catch (e) {
-      print('❌ TTS Error: $e');
+      print('TTS Error: $e');
     }
   }
 

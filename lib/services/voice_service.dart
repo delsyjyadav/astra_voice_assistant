@@ -13,59 +13,46 @@ class VoiceService {
     _tts = FlutterTts();
   }
 
-  Future<bool> initialize() async {
+  Future<bool> initialize() async{
     try {
-      // Initialize TTS
+
       await _tts.setLanguage("en-US");
       await _tts.setSpeechRate(0.5);
       await _tts.setPitch(1.0);
 
-      // ✅ FIX: Karen voice को हटाओ, default use करो
-      // या फिर en-US-x-sfg-network use करो (जो पहले काम कर रहा था)
+
       try {
-        var voices = await _tts.getVoices;
-        for (var voice in voices) {
-          String name = voice['name'].toString().toLowerCase();
-          if (name.contains('female') || name.contains('en-us-x-sfg')) {
-            await _tts.setVoice(voice);
-            break;
-          }
-        }
+        await _tts.setVoice({"name": "en-us-x-sfg-network", "locale": "en-US"});
+        print("Voice set to en-us-x-sfg-network");
       } catch (e) {
-        print('Voice selection error: $e');
+        print("Could not set specific voice, using default");
       }
 
-      _tts.setCompletionHandler(() {
+      _tts.setCompletionHandler((){
         _isSpeaking = false;
       });
 
-      _tts.setErrorHandler((error) {
+      _tts.setErrorHandler((error){
         print('TTS Error: $error');
         _isSpeaking = false;
       });
 
-      try {
-        await _tts.setVoice({"name": "en-us-x-sfg-network", "locale": "en-US"});
-      } catch (e) {
-        print('Voice selection error: $e');
-      }
 
-      // Initialize Speech
       _isInitialized = await _speech.initialize(
-        onStatus: (status) {
+        onStatus: (status){
           print('Speech status: $status');
           if (status == 'done' || status == 'notListening') {
             _isListening = false;
           }
         },
-        onError: (error) {
+        onError: (error){
           print('Speech error: ${error.errorMsg}');
           _isListening = false;
         },
       );
 
       return _isInitialized;
-    } catch (e) {
+    } catch (e){
       print('Voice service init error: $e');
       return false;
     }
@@ -75,8 +62,8 @@ class VoiceService {
   bool get isSpeaking => _isSpeaking;
   bool get isInitialized => _isInitialized;
 
-  Future<void> startListening(Function(String) onResult) async {
-    if (!_isInitialized) {
+  Future<void> startListening(Function(String) onResult) async{
+    if (!_isInitialized){
       await initialize();
     }
 
@@ -84,14 +71,20 @@ class VoiceService {
       _isListening = true;
       await _speech.listen(
         onResult: (result) {
-          if (result.finalResult) {
+
+          if (result.finalResult && result.recognizedWords.isNotEmpty) {
             onResult(result.recognizedWords);
           }
         },
-        listenFor: const Duration(seconds: 10),
+        listenFor: const Duration(seconds: 30),
         pauseFor: const Duration(seconds: 3),
-        partialResults: true,  // ✅ true करो
+        partialResults: true,
+
         localeId: 'en_US',
+        listenOptions: stt.SpeechListenOptions(
+          cancelOnError: true,
+          listenMode: stt.ListenMode.confirmation,
+        ),
       );
     }
   }
@@ -115,7 +108,7 @@ class VoiceService {
     }
   }
 
-  void dispose() {
+  void dispose(){
     _speech.stop();
     _tts.stop();
   }

@@ -31,7 +31,8 @@ class AstraApp extends StatelessWidget{
   }
 }
 
-//color const
+
+
 class AppColors {
   static const neonPink = Color(0xFF1457FF);
   static const lightPink = Color(0xFF68C0E6);

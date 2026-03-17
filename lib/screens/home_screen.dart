@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
     setState(() => _isWakeWordActive = false);
     _wakeWordHandler.pauseListening();
 
-    //navigate to aichat screen
+
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const ChatScreen()),
@@ -342,32 +342,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
 
         const SizedBox(height: 20),
 
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const TestSpeechScreen()),
-            );
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.blue),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.settings_voice, color: Colors.blue, size: 16),
-                SizedBox(width: 4),
-                Text(
-                  'Test Microphone',
-                  style: TextStyle(color: Colors.blue, fontSize: 12),
-                ),
-              ],
-            ),
-          ),
-        ),
       ],
     );
   }
